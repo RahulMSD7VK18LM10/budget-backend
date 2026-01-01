@@ -6,8 +6,8 @@ const generateToken = require('../utils/generateToken');
 const jwt = require("jsonwebtoken");
 // const JWT_SECRETE = "RAHULISCHAMPION";
 const nodemailer = require("nodemailer");
-//loading env file
-process.loadEnvFile();
+//loading env file - dev
+//process.loadEnvFile();
 const JWT_SECRETE = process.env.JWT_SECRETE;
 const transporter = nodemailer.createTransport({
   service: "Gmail", 

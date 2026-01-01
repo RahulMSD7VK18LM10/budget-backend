@@ -3,8 +3,8 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require('express-async-handler');
 const User = require("../models/userModel");
 
-//loading env file
-process.loadEnvFile();
+//loading env file -dev
+//process.loadEnvFile();
 const JWT_SECRETE = process.env.JWT_SECRETE;
 const protect = asyncHandler(async (req, res, next) => {
     let token;
