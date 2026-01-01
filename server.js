@@ -7,8 +7,10 @@ const tnxRoutes = require('./routes/tnxRoutes');
 const {notFound, errorHandler} = require('./middleware/errorMiddleware');
 
 
-//loading env file
-process.loadEnvFile();
+//loading env file - dev
+// process.loadEnvFile();
+//prod
+require('dotenv').config();
 //calling db connection function
 connectToMongo();
 //i am using cors
@@ -30,4 +32,7 @@ app.get('/',(req,res)=>{
     res.send("Api is running");
 })
 
-app.listen(8000,console.log("server running on port 8000"))
+// ✅ IMPORTANT: Dynamic PORT for Render
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT,console.log("server running on port 8000"))
