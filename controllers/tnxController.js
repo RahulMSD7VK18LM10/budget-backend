@@ -2,7 +2,8 @@ const Tnx = require("../models/tnxModel");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 
-process.loadEnvFile();
+//loading env file - dev
+//process.loadEnvFile();
 const JWT_SECRETE = process.env.JWT_SECRETE;
 
 /* ───────────────── ADD TRANSACTION ───────────────── */
