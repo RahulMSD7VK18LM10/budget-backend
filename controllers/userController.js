@@ -207,7 +207,7 @@ exports.sendEmail = asyncHandler(async (req, res) => {
               Thanks & Regards
               Team Budget</p>`
     };
-    transporter.sendMail(mailOptions, (error, info) => {
+    await transporter.sendMail(mailOptions, (error, info) => {
        if(error){
          return res.status(500).send(error);
        }
@@ -247,13 +247,18 @@ exports.sendEmail = asyncHandler(async (req, res) => {
         res.status(200).json(true);
       }
     });
-    const userDataFromEmail = await User.findOne({ email:email});
-    userDataFromEmail.password=tempPassword;
-    const result = userDataFromEmail.save();
+    try {
+      const userDataFromEmail = await User.findOne({ email: email });
+      userDataFromEmail.password = tempPassword; 
+      await userDataFromEmail.save(); // await here
+      res.status(200).json({ message: "Temporary password sent and saved" });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   }
   else{
-    //Message from here.
-    //console.log("No")
+    console.log("No")
   }
 });
 

@@ -1,2 +1,5 @@
 node_modules
 .env
+android/budget-release-key.keystore
+android/budget-release-key.keystore
+android/gradle.properties
