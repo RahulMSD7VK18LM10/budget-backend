@@ -187,6 +187,7 @@ exports.userExistCheck = asyncHandler(async (req, res) => {
 // @route POST /api/user/sendEmail
 // @access Private
 exports.sendEmail = asyncHandler(async (req, res) => {
+  console.log("api called")
   const {email, email_context} = req.body;
   //logic for sending otp via email
   if(email_context==="OTP"){
@@ -211,6 +212,7 @@ exports.sendEmail = asyncHandler(async (req, res) => {
        if(error){
          return res.status(500).send(error);
        }
+       console.log(otp)
        res.status(200).json(otp);
     });
   }
