@@ -14,7 +14,10 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.COMPANY_EMAIL,
     pass: process.env.COMPANY_PASSWORD
-  }
+  },
+  connectionTimeout: 10000, // 10 sec
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // @desc Auth user & get token
@@ -211,13 +214,18 @@ exports.sendEmail = asyncHandler(async (req, res) => {
               Thanks & Regards
               Team Budget</p>`
     };
-    await transporter.sendMail(mailOptions, (error, info) => {
-       if(error){
-         return res.status(500).send(error);
-       }
-       console.log(otp)
-       res.status(200).json(otp);
-    });
+    console.log("📤 Sending OTP email...");
+    // await transporter.sendMail(mailOptions, (error, info) => {
+    //   console.log(info)
+    //    if(error){
+    //      return res.status(500).send(error);
+    //    }
+    //    console.log(otp)
+    //    res.status(200).json(otp);
+    // });
+    await transporter.sendMail(mailOptions);
+    console.log("✅ OTP email sent");
+    return res.status(200).json({ otp });
   }
   //logic for sending temporary password for login
   else if(email_context==="PASSWORD"){
@@ -244,14 +252,17 @@ exports.sendEmail = asyncHandler(async (req, res) => {
               Thanks & Regards<br/>
               Team Budget</p>`
     };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if(error){
-        return res.status(500).send(error);
-      }
-      else{
-        res.status(200).json(true);
-      }
-    });
+    // transporter.sendMail(mailOptions, (error, info) => {
+    //   if(error){
+    //     return res.status(500).send(error);
+    //   }
+    //   else{
+    //     res.status(200).json(true);
+    //   }
+    // });
+      console.log("📤 Sending password email...");
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Password email sent");
     try {
       const userDataFromEmail = await User.findOne({ email: email });
       userDataFromEmail.password = tempPassword; 
