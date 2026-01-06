@@ -174,11 +174,14 @@ exports.deleteProfile = asyncHandler(async (req, res) => {
 // @access Private
 exports.userExistCheck = asyncHandler(async (req, res) => {
   const {email} = req.body;
+  console.log(email)
   const userExists = await User.findOne({email:email});
   if (userExists) {
+    console.log('user is there')
     res.json(true);
   }
   else{
+    console.log('user is not there')
     res.json(false);
   }
 });
