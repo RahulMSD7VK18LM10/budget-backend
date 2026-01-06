@@ -177,7 +177,7 @@ exports.deleteProfile = asyncHandler(async (req, res) => {
 // @access Private
 exports.userExistCheck = asyncHandler(async (req, res) => {
   const {email} = req.body;
-  console.log(email)
+  // console.log(email)s
   const userExists = await User.findOne({email:email});
   if (userExists) {
     console.log('user is there')
@@ -223,7 +223,20 @@ exports.sendEmail = asyncHandler(async (req, res) => {
     //    console.log(otp)
     //    res.status(200).json(otp);
     // });
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Email sent");
+    } catch (error) {
+      if (
+        error.code === 'ETIMEDOUT' ||
+        error.code === 'ESOCKET' ||
+        error.message.toLowerCase().includes('timeout')
+      ) {
+        console.error("⏱ Email request TIMED OUT");
+      } else {
+        console.error("❌ Email error:", error.message);
+      }
+    }
     console.log("✅ OTP email sent");
     return res.status(200).json({ otp });
   }
