@@ -9,11 +9,16 @@ const nodemailer = require("nodemailer");
 //loading env file - dev
 //process.loadEnvFile();
 const JWT_SECRETE = process.env.JWT_SECRETE;
+console.log(process.env.BREVO_SMTP_PASSWORD)
+console.log(process.env.BREVO_SMTP_USER)
 const transporter = nodemailer.createTransport({
-  service: "Gmail", 
+  // service: "Gmail", 
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.COMPANY_EMAIL,
-    pass: process.env.COMPANY_PASSWORD
+    user: process.env.BREVO_SMTP_USER,
+    pass: process.env.BREVO_SMTP_PASSWORD,
   },
   connectionTimeout: 10000, // 10 sec
   greetingTimeout: 10000,
@@ -226,6 +231,7 @@ exports.sendEmail = asyncHandler(async (req, res) => {
     try {
       await transporter.sendMail(mailOptions);
       console.log("✅ Email sent");
+      return res.status(200).json({ otp });
     } catch (error) {
       if (
         error.code === 'ETIMEDOUT' ||
@@ -237,8 +243,6 @@ exports.sendEmail = asyncHandler(async (req, res) => {
         console.error("❌ Email error:", error.message);
       }
     }
-    console.log("✅ OTP email sent");
-    return res.status(200).json({ otp });
   }
   //logic for sending temporary password for login
   else if(email_context==="PASSWORD"){
