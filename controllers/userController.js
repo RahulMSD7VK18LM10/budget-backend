@@ -4,7 +4,6 @@ const Tnx = require("../models/tnxModel");
 const asyncHandler = require("express-async-handler");
 const generateToken = require('../utils/generateToken');
 const jwt = require("jsonwebtoken");
-// const JWT_SECRETE = "RAHULISCHAMPION";
 const nodemailer = require("nodemailer");
 //loading env file - dev
 //process.loadEnvFile();
