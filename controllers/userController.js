@@ -13,15 +13,25 @@ console.log(process.env.BREVO_SMTP_USER)
 const transporter = nodemailer.createTransport({
   // service: "Gmail", 
   host: 'smtp-relay.brevo.com',
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.BREVO_SMTP_USER,
     pass: process.env.BREVO_SMTP_PASSWORD,
   },
-  connectionTimeout: 10000, // 10 sec
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  // connectionTimeout: 10000, // 10 sec
+  // greetingTimeout: 10000,
+  // socketTimeout: 10000,
+   tls: {
+    rejectUnauthorized: false
+  }
+});
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("❌ SMTP VERIFY ERROR:", error);
+  } else {
+    console.log("✅ SMTP Server is ready to send emails");
+  }
 });
 
 // @desc Auth user & get token
