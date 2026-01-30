@@ -5,34 +5,37 @@ const asyncHandler = require("express-async-handler");
 const generateToken = require('../utils/generateToken');
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const axios = require("axios");
 //loading env file - dev
 //process.loadEnvFile();
 const JWT_SECRETE = process.env.JWT_SECRETE;
-console.log(process.env.BREVO_SMTP_PASSWORD)
-console.log(process.env.BREVO_SMTP_USER)
-const transporter = nodemailer.createTransport({
-  // service: "Gmail", 
-  host: 'smtp-relay.brevo.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.BREVO_SMTP_USER,
-    pass: process.env.BREVO_SMTP_PASSWORD,
-  },
-  // connectionTimeout: 10000, // 10 sec
-  // greetingTimeout: 10000,
-  // socketTimeout: 10000,
-   tls: {
-    rejectUnauthorized: false
+
+const sendBrevoEmail = async ({ to, subject, html }) => {
+  try {
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "Budget App",
+          email: process.env.COMPANY_EMAIL
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_SMTP_APIKEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    console.log("✅ Email sent via Brevo API");
+  } catch (err) {
+    console.error("❌ Brevo API error:", err.response?.data || err.message);
+    throw err;
   }
-});
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP VERIFY ERROR:", error);
-  } else {
-    console.log("✅ SMTP Server is ready to send emails");
-  }
-});
+};
 
 // @desc Auth user & get token
 // @route POST /api/user/login
@@ -213,9 +216,9 @@ exports.sendEmail = asyncHandler(async (req, res) => {
   if(email_context==="OTP"){
     const otp = Math.floor(100000 + Math.random() * 900000);
     const mailOptions = {
-      from: process.env.COMPANY_EMAIL,
-      to: email,
-      subject: "One Time Password - BUDGET",
+      // from: process.env.COMPANY_EMAIL,
+      // to: email,
+      // subject: "One Time Password - BUDGET",
       html: `<p>Hello user,
               <br/>
               <br/>
@@ -229,16 +232,12 @@ exports.sendEmail = asyncHandler(async (req, res) => {
               Team Budget</p>`
     };
     console.log("📤 Sending OTP email...");
-    // await transporter.sendMail(mailOptions, (error, info) => {
-    //   console.log(info)
-    //    if(error){
-    //      return res.status(500).send(error);
-    //    }
-    //    console.log(otp)
-    //    res.status(200).json(otp);
-    // });
     try {
-      await transporter.sendMail(mailOptions);
+      await sendBrevoEmail({
+        to: email,
+        subject: "One Time Password - BUDGET",
+        html: mailOptions.html
+      });
       console.log("✅ Email sent");
       return res.status(200).json({ otp });
     } catch (error) {
@@ -261,9 +260,9 @@ exports.sendEmail = asyncHandler(async (req, res) => {
       tempPassword += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     const mailOptions = {
-      from: process.env.COMPANY_EMAIL,
-      to: email,
-      subject: "TEMPORARY PASSWORD - BUDGET",
+      // from: process.env.COMPANY_EMAIL,
+      // to: email,
+      // subject: "TEMPORARY PASSWORD - BUDGET",
       html: `<p>Hello user,
               <br/>
               <br/>
@@ -278,16 +277,12 @@ exports.sendEmail = asyncHandler(async (req, res) => {
               Thanks & Regards<br/>
               Team Budget</p>`
     };
-    // transporter.sendMail(mailOptions, (error, info) => {
-    //   if(error){
-    //     return res.status(500).send(error);
-    //   }
-    //   else{
-    //     res.status(200).json(true);
-    //   }
-    // });
       console.log("📤 Sending password email...");
-      await transporter.sendMail(mailOptions);
+      await sendBrevoEmail({
+        to: email,
+        subject: "TEMPORARY PASSWORD - BUDGET",
+        html: mailOptions.html
+      });
       console.log("✅ Password email sent");
     try {
       const userDataFromEmail = await User.findOne({ email: email });
